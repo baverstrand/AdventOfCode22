@@ -11,7 +11,7 @@ namespace AdventOfCode22
 {
     public class Day02
     {
-        public static void Run02()
+        public static void Run()
         {
             //var day = "02Test";
             var day = "02Data";
