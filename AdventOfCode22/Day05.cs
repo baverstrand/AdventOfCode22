@@ -1,6 +1,7 @@
 ﻿using AdventOfCode22.Help;
 using AdventOfCode22.Models;
 using System;
+using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 
 namespace AdventOfCode22
@@ -32,12 +33,21 @@ namespace AdventOfCode22
                 }
             }
 
+            var columnsCounter = 0;
+            for (var i = 0; i < data[columnFinder].Length; i++)
+            {
+                if (char.IsDigit(data[columnFinder][i]))
+                {
+                    columnsCounter = int.Parse((data[columnFinder][i]).ToString());
+                }
+            }
+
             // Gör grid med packages
             List<List<char>> packageStack = new();
             for (var i = 0; i < columnFinder; i++)
             {
                 List<char> packageRow= new();
-                for (var j = 1; j < data[0].Length; j += 4)
+                for (var j = 1; j < columnsCounter * 4; j += 4)
                 {
                     if (char.IsWhiteSpace(data[i][j]))
                     {
@@ -71,7 +81,7 @@ namespace AdventOfCode22
                     moves.Add(m);
                 }
             }
-
+            PrintGrid(packageStack);
             /*
              * Hitta från-index (faktisk -1), point
              * Hitta till-index (faktisk -1)
@@ -97,15 +107,16 @@ namespace AdventOfCode22
                 packageStack = AddRows(rowsToAdd, packageStack);
                 toIndex = FindToIndex(triple, packageStack);
             }
-            var fromIndex = FindFromIndex(triple, packageStack);
+            Point fromIndex = new();
 
             for (var i = 0; i < boxesToMove; i++)
             {
+                fromIndex = FindFromIndex(triple, packageStack);
+                toIndex = FindToIndex(triple, packageStack);
                 var letter = packageStack[fromIndex.Y][fromIndex.X];
                 packageStack[fromIndex.Y][fromIndex.X] = 'x';
                 packageStack[toIndex.Y][toIndex.X] = letter;
-                fromIndex.Y++;
-                toIndex.Y--;
+                PrintGrid(packageStack);
             }
             PrintGrid(packageStack);
 
@@ -129,15 +140,23 @@ namespace AdventOfCode22
         private static List<List<char>> AddRows(int rowsToAdd, List<List<char>> packageStack)
         {
             var row = new List<char>();
+            List<List<char>> nps = new();
             for (var i = 0; i < packageStack[0].Count; i++)
             {
                 row.Add('x');
             }
+
             for (var i = 0; i < rowsToAdd; i++)
             {
-                packageStack = packageStack.Prepend(row).ToList();
+                nps.Add(row);
             }
-            return packageStack;
+
+            foreach (var line in packageStack)
+            {
+                nps.Add(line);
+            }
+            PrintGrid(nps);
+            return nps;
         }
 
         private static Point FindFromIndex(Triple triple, List<List<char>> packageStack)
