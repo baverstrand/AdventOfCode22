@@ -109,14 +109,16 @@ namespace AdventOfCode22
             }
             Point fromIndex = new();
 
+            var packArray = packageStack.ToArray();
+
             for (var i = 0; i < boxesToMove; i++)
             {
-                fromIndex = FindFromIndex(triple, packageStack);
-                toIndex = FindToIndex(triple, packageStack);
+                fromIndex = FindFromIndex(triple, packArray.ToList());
+                toIndex = FindToIndex(triple, packArray.ToList());
                 var letter = packageStack[fromIndex.Y][fromIndex.X];
-                packageStack[fromIndex.Y][fromIndex.X] = 'x';
-                packageStack[toIndex.Y][toIndex.X] = letter;
-                PrintGrid(packageStack);
+                packArray[fromIndex.Y][fromIndex.X] = 'x';
+                packArray[toIndex.Y][toIndex.X] = letter;
+                PrintGrid(packArray.ToList() );
             }
             PrintGrid(packageStack);
 
