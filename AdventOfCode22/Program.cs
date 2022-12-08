@@ -6,4 +6,5 @@ Console.WriteLine("Hello, World!");
 // Day02.Run();
 // Day03.Run();
 // Day04.Run();
-Day05.Run();
+// Day05.Run();
+Day06.Run();

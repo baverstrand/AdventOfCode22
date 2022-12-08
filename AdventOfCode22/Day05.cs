@@ -10,15 +10,6 @@ namespace AdventOfCode22
     {
         public static void Run()
         {
-            //TODO rad 13 i .txt får out of range-problem
-            // 13 rows men shit nånting
-            /*
-             * Läs in alla rader
-             * Först kolumner i forloop tills contains 1
-             * sen hitta move
-             * gör till triples
-             * körkörkör
-             */
             //var day = "05Test";
             var day = "05Data";
             var data = Helpers.ReadLines(day);
@@ -81,48 +72,79 @@ namespace AdventOfCode22
                     moves.Add(m);
                 }
             }
-            PrintGrid(packageStack);
-            /*
-             * Hitta från-index (faktisk -1), point
-             * Hitta till-index (faktisk -1)
-             * Kolla om rader räcker till (till-index - antal > 0?)
-             * (Prepend rad(er))
-             */
-
+            
+            // Gör moves
             for (var i = 0; i < moves.Count; i++)
             {
                 packageStack = MakeMove(moves[i], packageStack);
             }
-            Console.WriteLine("");
+
+            // Kolla bokstäver i raden
+            PrintGrid(packageStack);
         }
+        #region part 2
 
         private static List<List<char>> MakeMove(Triple triple, List<List<char>> packageStack)
         {
             var toIndex = FindToIndex(triple, packageStack);
-
-            var boxesToMove = int.Parse(triple.First);
-            if (toIndex.Y - boxesToMove < 0)
+            var boxesToMove = GetBoxString(triple, packageStack);
+            if (toIndex.Y - boxesToMove.Length < 0)
             {
-                var rowsToAdd = 0 - (toIndex.Y - (boxesToMove - 1));
+                var rowsToAdd = 0 - (toIndex.Y - (boxesToMove.Length - 1));
                 packageStack = AddRows(rowsToAdd, packageStack);
                 toIndex = FindToIndex(triple, packageStack);
             }
-            Point fromIndex = new();
 
-            for (var i = 0; i < boxesToMove; i++)
+            for (var i = 0; i < boxesToMove.Length; i++)
             {
-                fromIndex = FindFromIndex(triple, packageStack);
+                var fromIndex = FindFromIndex(triple, packageStack);
                 toIndex = FindToIndex(triple, packageStack);
-                var letter = packageStack[fromIndex.Y][fromIndex.X];
                 packageStack[fromIndex.Y][fromIndex.X] = 'x';
-                packageStack[toIndex.Y][toIndex.X] = letter;
-                PrintGrid(packageStack);
+                packageStack[toIndex.Y][toIndex.X] = boxesToMove[i];
             }
-            PrintGrid(packageStack);
 
             return packageStack;
         }
 
+        private static string GetBoxString(Triple triple, List<List<char>> packageStack)
+        {
+            var boxesToMove = "";
+            var boxAmount = int.Parse(triple.First);
+            var fromIndex = FindFromIndex(triple, packageStack);
+            for (var i = fromIndex.Y; i < fromIndex.Y + boxAmount; i++)
+            {
+                boxesToMove = packageStack[i][fromIndex.X] + boxesToMove;
+            }
+
+            return boxesToMove;
+        }
+        #endregion
+
+        #region part 1
+        //private static List<List<char>> MakeMove(Triple triple, List<List<char>> packageStack)
+        //{
+        //    var toIndex = FindToIndex(triple, packageStack);
+
+        //    var boxesToMove = int.Parse(triple.First);
+        //    if (toIndex.Y - boxesToMove < 0)
+        //    {
+        //        var rowsToAdd = 0 - (toIndex.Y - (boxesToMove - 1));
+        //        packageStack = AddRows(rowsToAdd, packageStack);
+        //        toIndex = FindToIndex(triple, packageStack);
+        //    }
+
+        //    for (var i = 0; i < boxesToMove; i++)
+        //    {
+        //        var fromIndex = FindFromIndex(triple, packageStack);
+        //        toIndex = FindToIndex(triple, packageStack);
+        //        var letter = packageStack[fromIndex.Y][fromIndex.X];
+        //        packageStack[fromIndex.Y][fromIndex.X] = 'x';
+        //        packageStack[toIndex.Y][toIndex.X] = letter;
+        //    }
+
+        //    return packageStack;
+        //}
+        #endregion
         private static void PrintGrid(List<List<char>> packageStack)
         {
             foreach (var row in packageStack)
@@ -139,15 +161,14 @@ namespace AdventOfCode22
 
         private static List<List<char>> AddRows(int rowsToAdd, List<List<char>> packageStack)
         {
-            var row = new List<char>();
             List<List<char>> nps = new();
-            for (var i = 0; i < packageStack[0].Count; i++)
-            {
-                row.Add('x');
-            }
-
             for (var i = 0; i < rowsToAdd; i++)
             {
+                var row = new List<char>();
+                for (var j = 0; j < packageStack[0].Count; j++)
+                {
+                    row.Add('x');
+                }
                 nps.Add(row);
             }
 
@@ -155,7 +176,6 @@ namespace AdventOfCode22
             {
                 nps.Add(line);
             }
-            PrintGrid(nps);
             return nps;
         }
 
