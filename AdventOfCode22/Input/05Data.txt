@@ -5,7 +5,7 @@
 [T]     [N] [N] [N] [D] [J] [G] [N]
 [W] [H] [H] [S] [C] [N] [R] [W] [D]
 [N] [P] [P] [W] [H] [H] [B] [N] [G]
-[L] [C] [W] [C] [P] [T] [M] [Z] [W]
+[L] [C] [W] [C] [P] [T] [M] [Z] [Wb]
  1   2   3   4   5   6   7   8   9 
 
 move 6 from 6 to 5

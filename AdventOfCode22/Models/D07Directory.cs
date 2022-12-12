@@ -10,5 +10,7 @@ namespace AdventOfCode22.Models
     {
         public string Name { get; set; }
         public string? Parent { get; set; }
+        public List<string>? ChildrenDirs { get; set; }
+        public List<string>? ChildrenFiles { get; set; }
     }
 }
