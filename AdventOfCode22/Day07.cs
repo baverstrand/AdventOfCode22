@@ -3,6 +3,7 @@ using AdventOfCode22.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,14 +19,13 @@ namespace AdventOfCode22
 
             List<D07Directory> directories = new();
             List<D07File> files = new();
-            D07Directory currentDirectory = new ();
 
             // Fill list
             foreach (var line in data)
             {
                 if (line.StartsWith("$ cd"))
                 {
-                    directories = HandleCD(currentDirectory, line);
+                    directories = HandleCD(directories, line);
                 }
                 else if (line.StartsWith("$ ls"))
                 {
@@ -34,21 +34,41 @@ namespace AdventOfCode22
                 else if (char.IsDigit(line[0])) 
                 {
                     // create file
+                    // set current as parent
                     // add file to current directory
                     // split on ' '
+                    // set filesize to split[0] double parse
                 }
                 else if (char.IsLetter(line[0]))
                 {
                     // create directory
-                    // add to vurrent directory
+                    // set current as parent
+                    // add this to children
                 }
             }
             
         }
 
-        private static List<D07Directory> HandleCD(D07Directory currentDirectory, string line)
+        private static List<D07Directory> HandleCD(List<D07Directory> directories, string line)
         {
-            throw new NotImplementedException();
+            var dir = line.Remove(0, 5);
+            if (dir == "..")
+            {
+                // hitta current dir
+                // sätt current till false
+                // kolla parent
+                // sätt parent till current
+            }
+            else 
+            {
+                // kolla om dir finns i listan
+                // om ja, sätt current till false
+                // sätt dir till true, 
+                // om nej, skapa dir
+                // sätt current som parent
+                // sätt dir till true
+            }
+            return directories;
         }
     }
 }
