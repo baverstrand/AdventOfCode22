@@ -13,5 +13,6 @@ namespace AdventOfCode22.Models
         public bool IsCurrent { get; set; }
         public List<string>? ChildrenDirs { get; set; }
         public List<string>? ChildrenFiles { get; set; }
+        public double? Value { get; set; }
     }
 }

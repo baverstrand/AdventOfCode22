@@ -8,7 +8,8 @@ namespace AdventOfCode22.Models
 {
     public class D07File
     {
-        public List<string> FilePath { get; set; }
+        public string Name { get; set; }
+        public string Directory { get; set; }
         public double FileSize { get; set; }
     }
 }
