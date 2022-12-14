@@ -106,7 +106,7 @@ namespace AdventOfCode22
                 }
             }
 
-            var f = new D07File
+            var f = new D07File // TODO Pangar här
             {
                 Name = fileName,
                 Directory = directories[currentDir].Name,
