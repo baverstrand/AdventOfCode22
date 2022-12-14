@@ -88,7 +88,7 @@ namespace AdventOfCode22
                 directories.Add(d);
                 
             }
-            throw new NotImplementedException();
+            return directories;
         }
 
         private static D07Obj HandleFile(List<D07Directory> directories, List<D07File> files, string line)
@@ -113,12 +113,11 @@ namespace AdventOfCode22
                 FileSize = fileSize
             };
 
-            if (files != null && !files.Contains(f))
+            if (!files.Contains(f))
             {
                 files.Add(f);
-                directories = UpdateValues(directories, f);
+                directories = UpdateDirectoryValue(directories, f);
             }
-            
 
             if (directories[currentDir].ChildrenFiles != null && 
                 !directories[currentDir].ChildrenFiles.Contains(fileName))
@@ -141,26 +140,24 @@ namespace AdventOfCode22
             return o;
         }
 
-        private static List<D07Directory> UpdateValues(List<D07Directory> directories, D07File f)
+        private static List<D07Directory> UpdateDirectoryValue(List<D07Directory> directories, D07File f)
         {
-            var topLevel = false;
-            var dirName = f.Directory;
-            var dirIndex = -1;
-
             for (var i = 0; i < directories.Count; i++)
             {
-                if (directories[i].Name.Equals(dirName))
+                if (directories[i].Name.Equals(f.Directory))
                 {
-                    dirIndex = i;
-
-                    // TODO Här är du :)  
+                    if (directories[i].Value != null && !directories[i].ChildrenFiles.Contains(f.Name))
+                    {
+                        directories[i].Value += f.FileSize;
+                        directories[i].ChildrenFiles.Add(f.Name);
+                    }
+                    else
+                    {
+                        List<string> l = new List<string> { f.Name };
+                        directories[i].ChildrenFiles = l;
+                        directories[i].Value = f.FileSize;
+                    }
                 }
-
-            }
-
-            while (!topLevel)
-            {
-                
             }
 
             return directories;
@@ -219,12 +216,14 @@ namespace AdventOfCode22
                         d.Parent = directories[parentIndex].Name;
                     }
 
-                    if (directories[parentIndex].ChildrenDirs != null && 
+                    if (parentIndex > 0 &&
+                        directories[parentIndex].ChildrenDirs != null && 
                         !directories[parentIndex].ChildrenDirs.Contains(dir))
                     {
                         directories[parentIndex].ChildrenDirs.Add(dir);
                     }
-                    else if (directories[parentIndex].ChildrenDirs == null)
+                    else if (parentIndex > 0 &&
+                        directories[parentIndex].ChildrenDirs == null)
                     {
                         List<string> l = new()
                         {
