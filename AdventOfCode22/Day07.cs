@@ -14,14 +14,13 @@ namespace AdventOfCode22
     {
         public static void Run()
         {
-            var day = "07Test";
-            // var day = "07Data";
+            // var day = "07Test";
+            var day = "07Data";
             var data = Helpers.ReadLines(day);
 
             List<D07Directory> directories = new();
-            List<D07File> files = new();
 
-            // Fill list
+            // Read list
             foreach (var line in data)
             {
                 if (line.StartsWith("$ cd"))
@@ -34,17 +33,18 @@ namespace AdventOfCode22
                 }
                 else if (char.IsDigit(line[0])) 
                 {
-                    var o = HandleFile(directories, files, line);
-                    directories.Clear();
-                    directories = o.Directories;
-                    files.Clear();
-                    files= o.Files;
+                    directories = HandleFile(directories, line);
                 }
                 else if (line.StartsWith("dir "))
                 {
                     directories = HandleDir(directories, line);
                 }
             }
+
+            // Sum up sizes
+
+
+            Console.ReadKey();
         }
 
         private static List<D07Directory> HandleDir(List<D07Directory> directories, string line)
@@ -91,7 +91,7 @@ namespace AdventOfCode22
             return directories;
         }
 
-        private static D07Obj HandleFile(List<D07Directory> directories, List<D07File> files, string line)
+        private static List<D07Directory> HandleFile(List<D07Directory> directories, string line)
         {
             var splitLine = line.Split(' ');
             var fileSize = double.Parse(splitLine[0]);
@@ -106,58 +106,24 @@ namespace AdventOfCode22
                 }
             }
 
-            var f = new D07File // TODO Pangar här
+            var f = new D07File
             {
                 Name = fileName,
                 Directory = directories[currentDir].Name,
                 FileSize = fileSize
             };
 
-            if (!files.Contains(f))
+            if (directories[currentDir].ChildrenFiles is not null &&
+                !directories[currentDir].ChildrenFiles.Contains(f))
             {
-                files.Add(f);
-                directories = UpdateDirectoryValue(directories, f);
+                directories[currentDir].ChildrenFiles.Add(f);
+                directories[currentDir].Value += f.FileSize;
             }
-
-            if (directories[currentDir].ChildrenFiles != null && 
-                !directories[currentDir].ChildrenFiles.Contains(fileName))
+            else if (directories[currentDir].ChildrenFiles is null)
             {
-                directories[currentDir].ChildrenFiles.Add(fileName);
-            }
-            else if (directories[currentDir].ChildrenFiles == null)
-            {
-                List<string> l = new()
-                { 
-                    fileName
-                };
+                List<D07File> l = new() { f };
                 directories[currentDir].ChildrenFiles = l;
-            }
-            var o = new D07Obj
-            {
-                Directories = directories,
-                Files = files
-            };
-            return o;
-        }
-
-        private static List<D07Directory> UpdateDirectoryValue(List<D07Directory> directories, D07File f)
-        {
-            for (var i = 0; i < directories.Count; i++)
-            {
-                if (directories[i].Name.Equals(f.Directory))
-                {
-                    if (directories[i].Value != null && !directories[i].ChildrenFiles.Contains(f.Name))
-                    {
-                        directories[i].Value += f.FileSize;
-                        directories[i].ChildrenFiles.Add(f.Name);
-                    }
-                    else
-                    {
-                        List<string> l = new List<string> { f.Name };
-                        directories[i].ChildrenFiles = l;
-                        directories[i].Value = f.FileSize;
-                    }
-                }
+                directories[currentDir].Value = f.FileSize;
             }
 
             return directories;
@@ -168,6 +134,7 @@ namespace AdventOfCode22
             var dir = line.Remove(0, 5);
             if (dir == "..")
             {
+                // hittar parent name, sätter nuvarande till false   
                 var parentName = "";
                 foreach (var directory in directories)
                 {
@@ -177,6 +144,7 @@ namespace AdventOfCode22
                         parentName= directory.Name;
                     }
                 }
+                // hittar parent i listan, sätter till true
                 foreach (var directory in directories)
                 {
                     if (directory.Name.Equals(parentName))
@@ -185,58 +153,27 @@ namespace AdventOfCode22
                     }
                 }
             }
-            else 
+            else if (directories.Count == 0)
             {
-                int dirIndex = -1;
-                int parentIndex = -1;
-                for (var i = 0; i < directories.Count; i++)
+                var d = new D07Directory
                 {
-                    if (directories[i].Name == dir)
-                    {
-                        dirIndex = i;
-                    }
-                    if (directories[i].IsCurrent)
-                    {
-                        directories[i].IsCurrent= false;
-                        parentIndex = i;
-                    }
-                }
-
-                if (dirIndex < 0)
+                    Name = dir,
+                    IsCurrent = true,
+                };
+                directories.Add(d);
+            }
+            else // om dir pekar på en plats
+            {
+                foreach (var directory in directories)
                 {
-                    var d = new D07Directory
+                    if (directory.Name == dir)
                     {
-                        Name = dir,
-                        IsCurrent = true,
-                        
-                    };
-
-                    if (d.Name != "/")
-                    {
-                        d.Parent = directories[parentIndex].Name;
+                        directory.IsCurrent = true;
                     }
-
-                    if (parentIndex > 0 &&
-                        directories[parentIndex].ChildrenDirs != null && 
-                        !directories[parentIndex].ChildrenDirs.Contains(dir))
+                    else if (directory.IsCurrent)
                     {
-                        directories[parentIndex].ChildrenDirs.Add(dir);
+                        directory.IsCurrent= false;
                     }
-                    else if (parentIndex > 0 &&
-                        directories[parentIndex].ChildrenDirs == null)
-                    {
-                        List<string> l = new()
-                        {
-                            dir
-                        };
-                        directories[parentIndex].ChildrenDirs = l;
-                    }
-                    directories.Add(d);
-                }
-                else
-                {
-                    directories[parentIndex].IsCurrent = false;
-                    directories[dirIndex].IsCurrent = true;
                 }
             }
             return directories;

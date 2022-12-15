@@ -12,7 +12,7 @@ namespace AdventOfCode22.Models
         public string? Parent { get; set; }
         public bool IsCurrent { get; set; }
         public List<string>? ChildrenDirs { get; set; }
-        public List<string>? ChildrenFiles { get; set; }
+        public List<D07File>? ChildrenFiles { get; set; }
         public double? Value { get; set; }
     }
 }
