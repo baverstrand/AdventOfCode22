@@ -9,10 +9,10 @@ namespace AdventOfCode22.Models
     public class D07Directory
     {
         public string Name { get; set; }
-        public string? Parent { get; set; }
+        public List<string>? Pathway { get; set; }
+        public int ParentId { get; set; }
         public bool IsCurrent { get; set; }
-        public List<string>? ChildrenDirs { get; set; }
-        public List<D07File>? ChildrenFiles { get; set; }
-        public double? Value { get; set; }
+        public List<D07File>? Files { get; set; }
+        public double Value { get; set; }
     }
 }
