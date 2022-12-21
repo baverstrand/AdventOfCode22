@@ -61,12 +61,11 @@ namespace AdventOfCode22
             int currentDirIndex = FindCurrentDirectory(directories);
             var splitLines = line.Split(' ');
             var name = splitLines[1];
-            var path = directories[currentDirIndex].Pathway;
             var isInList = false;
 
             foreach (var dir in directories)
             {
-                if (dir.Name == name && dir.Pathway == path)
+                if (dir.Name == name && dir.ParentId == currentDirIndex)
                 {
                     isInList = true;
                 }
@@ -74,24 +73,22 @@ namespace AdventOfCode22
 
             if (!isInList)
             {
-                List<string> nPath = new();
-                foreach (var dir in path)
-                {
-                    nPath.Add(dir);
-                }
-                nPath.Add(directories[currentDirIndex].Name);
+                List<string> nPath = CreateNewPath(directories[currentDirIndex]);
+                List<D07File> files = new();
                 var d = new D07Directory
                 {
                     Name = splitLines[1],
                     Pathway = nPath,
+                    ParentId = currentDirIndex,
                     IsCurrent = false,
+                    Files= files,
                     Value = 0
                 };
                 directories.Add(d);
             }
             return directories;
         }
-
+        
         private static List<D07Directory> HandleFile(List<D07Directory> directories, string line)
         {
             // Hämta info
@@ -108,15 +105,9 @@ namespace AdventOfCode22
             };
 
             // LÄgg till som child
-            if (directories[currentDir].Files is not null &&
-                !directories[currentDir].Files.Contains(f))
+            if (!directories[currentDir].Files.Contains(f))
             {
                 directories[currentDir].Files.Add(f);
-            }
-            else if (directories[currentDir].Files is null)
-            {
-                List<D07File> l = new() { f };
-                directories[currentDir].Files = l;
             }
 
             // Uppdatera value uppåt
@@ -129,48 +120,26 @@ namespace AdventOfCode22
         {
             var currentDir = FindCurrentDirectory(directories);
             directories[currentDir].Value += f.FileSize;
-            foreach (var dir in directories[currentDir].Pathway)
+            var parentId = directories[currentDir].ParentId;
+            
+            while (parentId >= 0)
             {
-                var dirIndex = FindCurrentDirectory(dir);
+                directories[parentId].Value += f.FileSize;
+                parentId = directories[parentId].ParentId;
             }
-            //var hasParent = true;
-            //var dir = f.Directory;
-            //while (hasParent)
-            //{
 
-            //    var dirIndex = FindPosition(directories, dir);
-                
-            //    directories[dirIndex].Value += f.FileSize;
-               
-            //    if (directories[dirIndex].Pathway.Count > 0)
-            //    {
-            //        dir = directories[dirIndex].Pathway.Last();
-            //    }
-            //    else
-            //    {
-            //        hasParent = false;
-            //    }
-            //}
             return directories;
         }
 
         private static List<D07Directory> HandleCD(List<D07Directory> directories, string line)
         {
             var dir = line.Remove(0, 5);
+            var currentIndex = FindCurrentDirectory(directories);
             if (dir == "..")
             {
                 // hittar parent name, sätter nuvarande till false och nya till true   
-                var parentId = -1;
-                foreach (var directory in directories)
-                {
-                    if (directory.IsCurrent)
-                    {
-                        directory.IsCurrent= false;
-                        parentId= directory.ParentId;
-                        directories[directory.ParentId].IsCurrent= true;
-                    }
-                }
-                // Todo fixa detta
+                directories[currentIndex].IsCurrent = false;
+                directories[directories[currentIndex].ParentId].IsCurrent = true;
             }
             else if (directories.Count == 0)
             {
@@ -179,21 +148,21 @@ namespace AdventOfCode22
                 {
                     Name = dir,
                     IsCurrent = true,
-                    ParentId = -1 
+                    Pathway = l,
+                    ParentId = -1
                 };
                 directories.Add(d);
             }
             else // om cd pekar på en plats
             {
+                directories[currentIndex].IsCurrent = false;
+
+                // hitta dir mha dess path + name
                 foreach (var directory in directories)
                 {
-                    if (directory.Name == dir)
+                    if (directory.Name == dir && directory.ParentId == currentIndex)
                     {
                         directory.IsCurrent = true;
-                    }
-                    else if (directory.IsCurrent)
-                    {
-                        directory.IsCurrent= false;
                     }
                 }
             }
@@ -212,16 +181,15 @@ namespace AdventOfCode22
             return -1;
         }
 
-        private static int FindPosition(List<D07Directory> directories, string name)
+        private static List<string> CreateNewPath(D07Directory dir)
         {
-            for (var pos = 0; pos < directories.Count; pos++)
+            List<string> nPath = new();
+            foreach (var n in dir.Pathway)
             {
-                if (directories[pos].Name == name)
-                {
-                    return pos;
-                }
+                nPath.Add(n);
             }
-            return -1;
+            nPath.Add(dir.Name);
+            return nPath;
         }
     }
 }
