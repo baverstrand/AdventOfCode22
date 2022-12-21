@@ -9,3 +9,4 @@ Console.WriteLine("Hello, World!");
 // Day05.Run();
 // Day06.Run();
 // Day07.Run();
+Day08.Run();
