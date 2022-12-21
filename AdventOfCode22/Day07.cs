@@ -53,7 +53,26 @@ namespace AdventOfCode22
                     totalSumOfDisposables += dir.Value;
                 }
             }
-            Console.WriteLine(totalSumOfDisposables);
+
+            //Console.WriteLine(totalSumOfDisposables);
+
+            // Find smallest dir larger than 30000000
+            var diskSpace = 70000000.0;
+            var usedSpace = directories[0].Value;
+            var currentFreeSpace = diskSpace - usedSpace;
+            var updateSpace = 30000000.0;
+            var neededSpace = updateSpace - currentFreeSpace;
+            var valueToUse = usedSpace;
+
+            foreach (var dir in directories)
+            {
+                if (dir.Value < valueToUse && dir.Value >= neededSpace)
+                {
+                    valueToUse = dir.Value;
+                }
+            }
+            
+            Console.WriteLine(valueToUse);
         }
 
         private static List<D07Directory> HandleDir(List<D07Directory> directories, string line)
